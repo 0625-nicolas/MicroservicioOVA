@@ -17,5 +17,6 @@ public class OVA {
     private long id;
     private String nombre;
     private String descripcion;
+    private long id_curso;
 
 }

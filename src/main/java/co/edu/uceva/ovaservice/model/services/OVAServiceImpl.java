@@ -10,30 +10,27 @@ import java.util.List;
 @Service
 public class OVAServiceImpl implements IOVAService {
 
-    IOVARepository productoRepository;
+    IOVARepository OVARepository;
 
-    public OVAServiceImpl(IOVARepository productoRepository) {this.productoRepository = productoRepository;}
-
-    @Override
-    public OVA save(OVA producto) {return productoRepository.save(producto); }
+    public OVAServiceImpl(IOVARepository ovaRepository) {this.OVARepository = ovaRepository;}
 
     @Override
-    public void delete(OVA producto) {
-        productoRepository.delete(producto);
+    public OVA save(OVA ova) {return OVARepository.save(ova); }
+
+    @Override
+    public void delete(OVA ova) { OVARepository.delete(ova);
     }
 
     @Override
-    public OVA findById(Long id) {
-        return productoRepository.findById(id).orElse(null);
+    public OVA findById(Long id) { return OVARepository.findById(id).orElse(null);
     }
 
     @Override
-    public OVA update(OVA producto) {
-        return productoRepository.save(producto);
+    public OVA update(OVA ova) { return OVARepository.save(ova);
     }
 
     @Override
     public List<OVA> findAll() {
-        return (List<OVA>) productoRepository.findAll();
+        return (List<OVA>) OVARepository.findAll();
     }
 }

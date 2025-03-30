@@ -14,10 +14,10 @@ public class OVARestController {
     private IOVAService OVAService;
 
     @Autowired
-    public OVARestController(IOVAService productoService) {this.OVAService = productoService;}
+    public OVARestController(IOVAService ovaService) {this.OVAService = ovaService;}
 
     @GetMapping("/ovas")
-    public List<OVA> getProductos() {return OVAService.findAll();}
+    public List<OVA> getOVAS() {return OVAService.findAll();}
 
     @PostMapping("/ovas")
     public OVA save(@RequestBody OVA ova) {return OVAService.save(ova);}
