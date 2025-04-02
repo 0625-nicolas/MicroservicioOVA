@@ -3,6 +3,7 @@ package co.edu.uceva.ovaservice.model.services;
 
 import co.edu.uceva.ovaservice.model.entities.OVA;
 import co.edu.uceva.ovaservice.model.repositories.IOVARepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ public class OVAServiceImpl implements IOVAService {
 
     IOVARepository OVARepository;
 
+    @Autowired
     public OVAServiceImpl(IOVARepository ovaRepository) {this.OVARepository = ovaRepository;}
 
     @Override
