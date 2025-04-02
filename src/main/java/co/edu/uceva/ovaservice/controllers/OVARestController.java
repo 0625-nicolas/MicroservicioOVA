@@ -3,6 +3,9 @@ package co.edu.uceva.ovaservice.controllers;
 import co.edu.uceva.ovaservice.model.entities.OVA;
 import co.edu.uceva.ovaservice.model.services.IOVAService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +21,12 @@ public class OVARestController {
 
     @GetMapping("/ovas")
     public List<OVA> getOVAS() {return OVAService.findAll();}
+
+    @GetMapping("/productos/page/{page}")
+    public Page<OVA> index(@PathVariable Integer page) {
+        Pageable pageable = PageRequest.of(page, 4);
+        return OVAService.findAll(pageable);
+    }
 
     @PostMapping("/ovas")
     public OVA save(@RequestBody OVA ova) {return OVAService.save(ova);}
