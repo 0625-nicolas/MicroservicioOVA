@@ -1,8 +1,8 @@
-package co.edu.uceva.ovaservice.model.services;
+package co.edu.uceva.ovaservice.domain.service;
 
 
-import co.edu.uceva.ovaservice.model.entities.OVA;
-import co.edu.uceva.ovaservice.model.repositories.IOVARepository;
+import co.edu.uceva.ovaservice.domain.model.OVA;
+import co.edu.uceva.ovaservice.domain.repository.IOVARepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

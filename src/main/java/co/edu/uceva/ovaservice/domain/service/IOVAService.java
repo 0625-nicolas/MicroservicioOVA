@@ -1,6 +1,6 @@
-package co.edu.uceva.ovaservice.model.services;
+package co.edu.uceva.ovaservice.domain.service;
 
-import co.edu.uceva.ovaservice.model.entities.OVA;
+import co.edu.uceva.ovaservice.domain.model.OVA;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

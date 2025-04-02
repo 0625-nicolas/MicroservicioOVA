@@ -1,4 +1,4 @@
-package co.edu.uceva.ovaservice.model.entities;
+package co.edu.uceva.ovaservice.domain.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
@@ -29,5 +29,6 @@ public class OVA {
     @NotNull(message = "El id es obligatorio")
     @Column(nullable = false)
     private long id_curso;
+
 
 }

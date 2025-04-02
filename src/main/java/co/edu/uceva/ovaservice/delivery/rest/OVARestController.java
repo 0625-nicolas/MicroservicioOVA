@@ -1,7 +1,8 @@
-package co.edu.uceva.ovaservice.controllers;
+package co.edu.uceva.ovaservice.delivery.rest;
 
-import co.edu.uceva.ovaservice.model.entities.OVA;
-import co.edu.uceva.ovaservice.model.services.IOVAService;
+import co.edu.uceva.ovaservice.domain.exception.NoHayovasException;
+import co.edu.uceva.ovaservice.domain.model.OVA;
+import co.edu.uceva.ovaservice.domain.service.IOVAService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -20,7 +21,7 @@ import java.util.Map;
 @RequestMapping("/api/v1/OVA-service")
 
 public class OVARestController {
-    private IOVAService OVAService;
+    private final IOVAService OVAService;
 
     private static final String ERROR = "error";
     private static final String MENSAJE = "mensaje";
@@ -30,30 +31,19 @@ public class OVARestController {
     @Autowired
     public OVARestController(IOVAService ovaService) {this.OVAService = ovaService; }
 
+
     /**
-     * Listar todos las ovas.
+     * Listar todos los ovas.
      */
     @GetMapping("/ovas")
     public ResponseEntity<Map<String, Object>> getOVAS() {
-        Map<String, Object> response = new HashMap<>();
-
-        try {
-            List<OVA> ovas = OVAService.findAll();
-
-            if (ovas.isEmpty()) {
-                response.put(MENSAJE, "No hay ovas en la base de datos.");
-                response.put(OVAS, ovas); // para que sea siempre el mismo campo
-                return ResponseEntity.status(HttpStatus.OK).body(response); // 200 pero lista vacía
-            }
-
-            response.put(OVAS, ovas);
-            return ResponseEntity.ok(response);
-
-        } catch (DataAccessException e) {
-            response.put(MENSAJE, "Error al consultar la base de datos.");
-            response.put(ERROR, e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        List<OVA> ovas = OVAService.findAll();
+        if (ovas.isEmpty()) {
+            throw new NoHayovasException();
         }
+        Map<String, Object> response = new HashMap<>();
+        response.put(OVAS, ovas);
+        return ResponseEntity.ok(response);
     }
 
     /**
