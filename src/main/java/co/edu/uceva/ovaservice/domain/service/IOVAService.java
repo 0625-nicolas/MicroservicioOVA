@@ -5,11 +5,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface IOVAService {
     OVA save(OVA ova);
     void delete(OVA ova);
-    OVA findById(Long id);
+    Optional<OVA> findById(Long id);
     OVA update(OVA ova);
     List<OVA> findAll();
     Page<OVA> findAll(Pageable pageable);

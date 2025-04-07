@@ -1,7 +1,8 @@
+
 package co.edu.uceva.ovaservice.domain.exception;
 
-public class NoHayovasException extends RuntimeException {
-    public NoHayovasException() {
+public class NoHayOvasException extends RuntimeException {
+    public NoHayOvasException() {
       super("No hay ovas en la base de datos");
     }
 

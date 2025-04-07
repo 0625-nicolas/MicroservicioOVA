@@ -1,6 +1,9 @@
 package co.edu.uceva.ovaservice.delivery.rest;
 
-import co.edu.uceva.ovaservice.domain.exception.NoHayovasException;
+import co.edu.uceva.ovaservice.domain.exception.NoHayOvasException;
+import co.edu.uceva.ovaservice.domain.exception.OvaNoEncontradoException;
+import co.edu.uceva.ovaservice.domain.exception.PaginaSinOvasException;
+import co.edu.uceva.ovaservice.domain.exception.ValidationException;
 import co.edu.uceva.ovaservice.domain.model.OVA;
 import co.edu.uceva.ovaservice.domain.service.IOVAService;
 import jakarta.validation.Valid;
@@ -18,7 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 @RestController
-@RequestMapping("/api/v1/OVA-service")
+@RequestMapping("/api/v1/ova-service")
 
 public class OVARestController {
     private final IOVAService OVAService;
@@ -33,16 +36,16 @@ public class OVARestController {
 
 
     /**
-     * Listar todos los ovas.
+     * Listar todos las ovas.
      */
     @GetMapping("/ovas")
-    public ResponseEntity<Map<String, Object>> getOVAS() {
-        List<OVA> ovas = OVAService.findAll();
-        if (ovas.isEmpty()) {
-            throw new NoHayovasException();
+    public ResponseEntity<Map<String, Object>> getProductos() {
+        List<OVA> productos = OVAService.findAll();
+        if (productos.isEmpty()) {
+            throw new NoHayOvasException();
         }
         Map<String, Object> response = new HashMap<>();
-        response.put(OVAS, ovas);
+        response.put(OVAS, productos);
         return ResponseEntity.ok(response);
     }
 
@@ -51,60 +54,27 @@ public class OVARestController {
      */
     @GetMapping("/ovas/page/{page}")
     public ResponseEntity<Object> index(@PathVariable Integer page) {
-        Map<String, Object> response = new HashMap<>();
         Pageable pageable = PageRequest.of(page, 4);
-
-        try {
-            Page<OVA> ovas = OVAService.findAll(pageable);
-
-            if (ovas.isEmpty()) {
-                response.put(MENSAJE, "No hay ovas en la página solicitada.");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-            }
-
-            return ResponseEntity.ok(ovas);
-
-        } catch (DataAccessException e) {
-            response.put(MENSAJE, "Error al consultar la base de datos.");
-            response.put(ERROR, e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        } catch (IllegalArgumentException e) {
-            response.put(MENSAJE, "Número de página inválido.");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        Page<OVA> productos = OVAService.findAll(pageable);
+        if (productos.isEmpty()) {
+            throw new PaginaSinOvasException(page);
         }
+        return ResponseEntity.ok(productos);
     }
 
     /**
      * Crear un nuevo ova pasando el objeto en el cuerpo de la petición.
      */
     @PostMapping("/ovas")
-    public ResponseEntity<Map<String, Object>> save(@Valid @RequestBody OVA ova , BindingResult result) {
-        Map<String, Object> response = new HashMap<>();
-
+    public ResponseEntity<Map<String, Object>> save(@Valid @RequestBody OVA ova, BindingResult result) {
         if (result.hasErrors()) {
-            List<String> errors = result.getFieldErrors()
-                    .stream()
-                    .map(err -> "El campo '" + err.getField() + "' " + err.getDefaultMessage())
-                    .toList();
-
-            response.put("errors", errors);
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            throw new ValidationException(result);
         }
-
-
-        try {
-            // Guardar el ova en la base de datos
-            OVA nuevoOVA = OVAService.save(ova);
-
-            response.put(MENSAJE, "El ova ha sido creado con éxito!");
-            response.put(OVA, nuevoOVA);
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
-
-        } catch (DataAccessException e) {
-            response.put(MENSAJE, "Error al insertar el ova en la base de datos.");
-            response.put(ERROR, e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
+        Map<String, Object> response = new HashMap<>();
+        OVA nuevoOVA = OVAService.save(ova);
+        response.put(MENSAJE, "El ova ha sido creado con éxito!");
+        response.put(OVA, nuevoOVA);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
 
@@ -112,23 +82,14 @@ public class OVARestController {
      * Eliminar un ova pasando el objeto en el cuerpo de la petición.
      */
     @DeleteMapping("/ovas")
-    public ResponseEntity<Map<String, Object>> delete(@RequestBody OVA ova) {
+    public ResponseEntity<Map<String, Object>> delete(@Valid @RequestBody OVA ova) {
+        OVAService.findById(ova.getId())
+                .orElseThrow(() -> new OvaNoEncontradoException(ova.getId()));
+        OVAService.delete(ova);
         Map<String, Object> response = new HashMap<>();
-        try {
-            OVA ovaExistente = OVAService.findById(ova.getId());
-            if (ovaExistente == null) {
-                response.put(MENSAJE, "El ova ID: " + ova.getId() + " no existe en la base de datos.");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-            }
-
-            OVAService.delete(ova);
-            response.put(MENSAJE, "El ova ha sido eliminado con éxito!");
-            return ResponseEntity.ok(response);
-        } catch (DataAccessException e) {
-            response.put(MENSAJE, "Error al eliminar el ova de la base de datos.");
-            response.put(ERROR, e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
+        response.put(MENSAJE, "El ova ha sido eliminado con éxito!");
+        response.put(OVA, null);
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -136,38 +97,17 @@ public class OVARestController {
      * @param ova: Objeto OVA que se va a actualizar
      */
     @PutMapping("/ovas")
-    public ResponseEntity<Map<String, Object>> update(@RequestBody OVA ova , BindingResult result) {
-        Map<String, Object> response = new HashMap<>();
-
+    public ResponseEntity<Map<String, Object>> update(@Valid @RequestBody OVA ova, BindingResult result) {
         if (result.hasErrors()) {
-            List<String> errors = result.getFieldErrors()
-                    .stream()
-                    .map(err -> "El campo '" + err.getField() + "' " + err.getDefaultMessage())
-                    .toList();
-
-            response.put("errors", errors);
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            throw new ValidationException(result);
         }
-
-        try {
-            // Verificar si el ova existe antes de actualizar
-            if (OVAService.findById(ova.getId()) == null) {
-                response.put(MENSAJE, "Error: No se pudo editar, el ova ID: " + ova.getId() + " no existe en la base de datos.");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-            }
-
-            // Guardar directamente el ova actualizado en la base de datos
-            OVA ovaActualizado = OVAService.save(ova);
-
-            response.put(MENSAJE, "El ova ha sido actualizado con éxito!");
-            response.put(OVA, ovaActualizado);
-            return ResponseEntity.ok(response);
-
-        } catch (DataAccessException e) {
-            response.put(MENSAJE, "Error al actualizar el ova en la base de datos.");
-            response.put(ERROR, e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
+        OVAService.findById(ova.getId())
+                .orElseThrow(() -> new OvaNoEncontradoException(ova.getId()));
+        Map<String, Object> response = new HashMap<>();
+        OVA OvaActualizado = OVAService.update(ova);
+        response.put(MENSAJE, "El ova ha sido actualizado con éxito!");
+        response.put(OVA, OvaActualizado);
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -175,25 +115,12 @@ public class OVARestController {
      */
     @GetMapping("/ovas/{id}")
     public ResponseEntity<Map<String, Object>> findById(@PathVariable Long id) {
+        OVA ova = OVAService.findById(id)
+                .orElseThrow(() -> new OvaNoEncontradoException(id));
         Map<String, Object> response = new HashMap<>();
-
-        try {
-            OVA ova = OVAService.findById(id);
-
-            if (ova == null) {
-                response.put(MENSAJE, "El ova ID: " + id + " no existe en la base de datos.");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-            }
-
-            response.put(MENSAJE, "El ova ha sido actualizado con éxito!");
-            response.put(OVA,ova);
-            return ResponseEntity.ok(response);
-
-        } catch (DataAccessException e) {
-            response.put(MENSAJE, "Error al consultar la base de datos.");
-            response.put(ERROR, e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
+        response.put(MENSAJE, "El OVA ha sido encontrado con éxito!");
+        response.put(OVA, ova);
+        return ResponseEntity.ok(response);
     }
 
 }

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class OVAServiceImpl implements IOVAService {
@@ -30,7 +31,7 @@ public class OVAServiceImpl implements IOVAService {
 
     @Override
     @Transactional(readOnly = true)
-    public OVA findById(Long id) { return OVARepository.findById(id).orElse(null);
+    public Optional<OVA> findById(Long id) { return OVARepository.findById(id);
     }
 
     @Override
@@ -40,7 +41,7 @@ public class OVAServiceImpl implements IOVAService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<OVA> findAll() { return (List<OVA>) OVARepository.findAll();
+    public List<OVA> findAll() { return OVARepository.findAll();
     }
 
     @Override
