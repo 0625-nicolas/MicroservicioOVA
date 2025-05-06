@@ -82,7 +82,7 @@ public class OVARestController {
      * Eliminar un ova pasando el objeto en el cuerpo de la petición.
      */
     @DeleteMapping("/ovas")
-    public ResponseEntity<Map<String, Object>> delete(@Valid @RequestBody OVA ova) {
+    public ResponseEntity<Map<String, Object>> delete(@RequestBody OVA ova) {
         OVAService.findById(ova.getId())
                 .orElseThrow(() -> new OvaNoEncontradoException(ova.getId()));
         OVAService.delete(ova);
