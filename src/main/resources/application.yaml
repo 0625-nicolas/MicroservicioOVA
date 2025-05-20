@@ -46,7 +46,7 @@ spring:
       maximum-pool-size: 50
       minimum-idle: 10
       validation-timeout: 5000
-    password: ${DB_PASS:a1b2c3d4}
+    password: ${DB_PASS:Nico_Guti_0625}
     url: ${DB_HOST:jdbc:postgresql://localhost:5432/curso_springboot}
     username: ${DB_USER:devdb}
   jpa:

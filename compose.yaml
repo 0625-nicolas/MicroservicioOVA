@@ -5,7 +5,7 @@ services:
     restart: unless-stopped
     depends_on:
       - db
-      - curso-service
+      - eureka-server
     ports:
       - "8080:8080"
       - "8081:8081"
@@ -26,19 +26,19 @@ services:
     restart: unless-stopped
     depends_on:
       - db
+      - eureka-server
     ports:
       - "8082:8082"
-      - "8083:8081"
+      - "8083:8083"
     environment:
       - DB_USER=userdb
       - DB_PASS=passdb
       - JPA_DDL=create-drop
       - DB_HOST=jdbc:postgresql://db:5432/curso_springboot
-      - PORT=8082
       - EUREKA_HOST=eureka-server
     networks:
       - mynetwork
-
+   #Se uso la imagen eureka de andres guevara que compartio por el grupo de scrum masters
   eureka-server:
     image:    andresguevara03/eurekaserver:latest
     container_name: eurekaserver
