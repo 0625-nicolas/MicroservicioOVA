@@ -5,6 +5,7 @@ import co.edu.uceva.ovaservice.domain.exception.OvaNoEncontradoException;
 import co.edu.uceva.ovaservice.domain.exception.PaginaSinOvasException;
 import co.edu.uceva.ovaservice.domain.exception.ValidationException;
 import co.edu.uceva.ovaservice.domain.model.OVA;
+import co.edu.uceva.ovaservice.domain.service.ICursoClient;
 import co.edu.uceva.ovaservice.domain.service.IOVAService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,19 +21,22 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/api/v1/ova-service")
 
 public class OVARestController {
     private final IOVAService OVAService;
-
+    private final ICursoClient cursoClient;
     private static final String ERROR = "error";
     private static final String MENSAJE = "mensaje";
     private static final String OVA = "ova";
     private static final String OVAS = "ovas";
 
     @Autowired
-    public OVARestController(IOVAService ovaService) {this.OVAService = ovaService; }
+    public OVARestController(IOVAService ovaService, ICursoClient cursoClient) {this.OVAService = ovaService;
+        this.cursoClient = cursoClient;
+    }
 
 
     /**
@@ -47,6 +51,10 @@ public class OVARestController {
         Map<String, Object> response = new HashMap<>();
         response.put(OVAS, productos);
         return ResponseEntity.ok(response);
+    }
+    @GetMapping("/cursos")
+    public ResponseEntity<Map<String, Object>> getCursos() {
+        return cursoClient.getCursos();
     }
 
     /**
